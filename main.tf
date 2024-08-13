@@ -15,7 +15,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
         ide {
             ide3 {
                 cloudinit {
-                    storage = "local-lvm"
+                    storage = var.storage_name_location
                 }
             }
         }
@@ -23,7 +23,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
             scsi0 {
                 disk {
                     size            = var.num_k8s_masters_disk
-                    storage         = "local-lvm"
+                    storage         = var.storage_name_location
                     iothread        = false
                     discard         = false
                 }
@@ -69,7 +69,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
         ide {
             ide3 {
                 cloudinit {
-                    storage = "local-lvm"
+                    storage = var.storage_name_location
                 }
             }
         }
@@ -77,7 +77,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
             scsi0 {
                 disk {
                     size            = var.num_k8s_workers_disk
-                    storage         = "local-lvm"
+                    storage         = var.storage_name_location
                     iothread        = false
                     discard         = false
                 }
