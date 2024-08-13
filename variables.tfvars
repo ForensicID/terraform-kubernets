@@ -1,7 +1,7 @@
-pm_host = "192.168.1.251"
-pm_user = "root@pam!terraform"
-pm_password = "d3c1654a-da01-476c-8412-98052cb7f9a2"
-pm_node_name = "prx"
+pm_host = "192.168.1.x"
+pm_user = "user-proxmox-api"
+pm_password = "password-proxmox-api"
+pm_node_name = "node-name-proxmox"
 pm_tls_insecure = true
 pub_key = "your-public-key"
 
@@ -17,11 +17,11 @@ num_k8s_workers_cpu = 4
 num_k8s_workers_mem = 2048
 num_k8s_workers_disk = 32
 
-tamplate_vm_name = "ubuntucloud22"
+tamplate_vm_name = "template-cloud-init"
 master_ips = [
-  "192.168.1.200"
+  "192.168.1.x"
 ]
 worker_ips = [
-  "192.168.1.202",
-  "192.168.1.203",
+  "192.168.1.x",
+  "192.168.1.x",
 ]
