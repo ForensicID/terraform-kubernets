@@ -28,7 +28,6 @@ variable "pm_node_name" {
   default     = "pve"
 }
 
-variable "pvt_key" {}
 variable "pub_key" {
   description = "Public SSH key"
   type        = string
