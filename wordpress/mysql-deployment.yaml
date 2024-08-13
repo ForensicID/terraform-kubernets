@@ -17,12 +17,12 @@ spec:
           image: mysql:8.0
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: Jogja@2020#!
+              value: example-root-password
             - name: MYSQL_DATABASE
-              value: wordpress
+              value: example-wordpress
             - name: MYSQL_USER
-              value: wp_user
+              value: example-wp_user
             - name: MYSQL_PASSWORD
-              value: Jogja@2020#!
+              value: example-password
           ports:
             - containerPort: 3306
