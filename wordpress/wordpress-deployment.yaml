@@ -21,8 +21,8 @@ spec:
             - name: WORDPRESS_DB_HOST
               value: mysql:3306
             - name: WORDPRESS_DB_NAME
-              value: wordpress
+              value: example-wordpress
             - name: WORDPRESS_DB_USER
-              value: wp_user
+              value: example-wp_user
             - name: WORDPRESS_DB_PASSWORD
-              value: Jogja@2020#!
+              value: example-password
