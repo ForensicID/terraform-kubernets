@@ -1,0 +1,19 @@
+- name: Installation Wordpress
+  hosts: master
+  remote_user: user
+  become: yes
+  tasks:
+    - name: Synchronize directory to remote host
+      ansible.builtin.synchronize:
+        src: wordpress/
+        dest: /root/wordpress
+        mode: push
+
+    - name: Add execute permission to a file
+      ansible.builtin.file:
+        path: /root/wordpress/install.sh
+        mode: '0755'
+
+    - name: Execute the script
+      ansible.builtin.shell:
+        cmd: /root/wordpress/install.sh

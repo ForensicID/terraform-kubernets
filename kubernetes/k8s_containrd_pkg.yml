@@ -1,0 +1,174 @@
+- hosts: all
+  remote_user: user
+  become: yes
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Make the Swap inactive
+      command: swapoff -a
+
+    - name: Remove Swap entry from /etc/fstab.
+      lineinfile:
+        dest: /etc/fstab
+        regexp: swap
+        state: absent
+
+    - name: Create a empty file for containerd module.
+      copy:
+        content: ""
+        dest: /etc/modules-load.d/containerd.conf
+        force: no
+
+    - name: Buat file konfigurasi untuk containerd
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/containerd.conf
+        content: |
+          overlay
+          br_netfilters
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Muat modul overlay
+      ansible.builtin.command:
+        cmd: modprobe overlay
+
+    - name: Muat modul br_netfilter
+      ansible.builtin.command:
+        cmd: modprobe br_netfilter
+
+    - name: Buat file konfigurasi sysctl untuk Kubernetes
+      ansible.builtin.copy:
+        dest: /etc/sysctl.d/kubernetes.conf
+        content: |
+          net.bridge.bridge-nf-call-iptables=1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Terapkan perubahan sysctl
+      ansible.builtin.command:
+        cmd: sysctl --system
+
+    - name: Apply sysctl changes
+      command: sysctl -p
+
+    - name: Installing Prerequisites for Kubernetes
+      apt:
+        name:
+          - apt-transport-https
+          - gnupg2
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - vim
+          - software-properties-common
+        state: present
+
+    - name: Unduh GPG key Docker dan simpan ke /etc/apt/trusted.gpg.d/docker.gpg
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /tmp/docker.gpg
+        mode: '0644'
+
+    - name: Konversi GPG key Docker ke format yang benar
+      ansible.builtin.command:
+        cmd: gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg /tmp/docker.gpg
+
+    - name: Add Docker Repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
+        state: present
+        filename: docker
+        update_cache: yes
+
+    - name: Install containerd.
+      apt:
+        name:
+          - containerd.io
+        state: present
+
+    - name: Menghasilkan konfigurasi default containerd
+      command: containerd config default
+      register: containerd_config_default
+      changed_when: false
+
+    - name: Menulis konfigurasi default containerd ke file
+      ansible.builtin.copy:
+        content: "{{ containerd_config_default.stdout }}"
+        dest: /etc/containerd/config.toml
+        mode: '0644'
+
+    - name: Backup config file
+      copy:
+        src: /etc/containerd/config.toml
+        dest: /etc/containerd/config.toml.bak
+        remote_src: yes
+
+    - name: Replace SystemdCgroup setting with sed
+      shell: sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+    - name: Enable containerd service, and start it.
+      systemd:
+        name: containerd
+        state: restarted
+        enabled: yes
+        daemon-reload: yes
+
+    - name: Add Google official GPG key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: Tambahkan repository Kubernetes ke sumber apt
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        content: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /\n"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Unduh kunci GPG Kubernetes
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key
+        dest: /tmp/kubernetes-release.key
+
+    - name: Konversi kunci GPG Kubernetes ke format yang benar
+      ansible.builtin.command:
+        cmd: gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+
+    - name: Hapus kunci GPG sementara
+      ansible.builtin.file:
+        path: /tmp/kubernetes-release.key
+        state: absent
+
+    - name: Update APT package index
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Installing Kubernetes Cluster Packages.
+      apt:
+        name:
+          - kubeadm
+          - kubectl
+          - kubelet
+        state: present
+
+    - name: Enable service kubelet, and enable persistently
+      service:
+        name: kubelet
+        enabled: yes
+
+    - name: Reboot all the kubernetes nodes.
+      reboot:
+        post_reboot_delay: 60
+        reboot_timeout: 80
+        connect_timeout: 300
+        test_command: uptime

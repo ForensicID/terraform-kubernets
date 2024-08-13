@@ -1,0 +1,57 @@
+- hosts: masters
+  remote_user: user
+  become: yes
+
+  tasks:
+
+    - name: Intilizing Kubernetes Cluster
+      shell: kubeadm init --ignore-preflight-errors=all
+
+    - pause: seconds=30
+
+    - name: Create directory for kube config.
+      become: yes
+      file:
+        path: /root/.kube
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Copy /etc/kubernetes/admin.conf to user home directory /root/.kube/config
+      become: yes
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+    - pause: seconds=30
+
+    - name: Remove the cache directory.
+      become: yes
+      file:
+        path: /root/.kube/cache
+        state: absent
+
+    - name: Create Pod Network & RBAC.
+      become: yes
+      command: "{{ item }}"
+      with_items:
+          - sudo kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+          - sudo kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+          
+    - pause: seconds=30
+
+    - name: Get the token for joining the nodes with Kuberentes master.
+      shell: kubeadm token create  --print-join-command
+      register: kubernetes_join_command
+
+    - debug:
+        msg: "{{ kubernetes_join_command.stdout }}"
+
+    - name: Copy join command to local file.
+      become: false
+      local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
