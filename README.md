@@ -25,13 +25,14 @@ Sebelum memulai, pastikan Anda telah memenuhi syarat berikut:
 
 - sudah mempunyai template cloud init
 - membuat user api proxmox
+- mengganti hosts.ini dengan ip yang akan digunakan
+- sesuaikan wordpress/mysql-deployment.yaml, wordpress/wordpress-deployment.yaml
+- sesuaikan variables.tfvars setelah anda mengcopy dari sample
 
 ## Instalasi
 1. git clone https://github.com/ForensicID/terraform-kubernetes.git
 2. cd terraform-kubernetes
-3. "sesuaikan variables.tfvars, wordpress/mysql-deployment.yaml, wordpress/wordpress-deployment.yaml"
-4. cp -R variables.tfvars.sample variables.tfvars
-5. "sesuaikan variables.tfvars"
+3. cp -R variables.tfvars.sample variables.tfvars
 4. terraform init
 5. terraform plan -var-file=variables.tfvars
 6. terraform apply -var-file=variables.tfvars
