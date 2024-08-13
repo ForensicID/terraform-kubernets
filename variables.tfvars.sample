@@ -17,6 +17,8 @@ num_k8s_workers_cpu = 4
 num_k8s_workers_mem = 2048
 num_k8s_workers_disk = 32
 
+storage-name-location = local-lvm
+
 tamplate_vm_name = "template-cloud-init"
 master_ips = [
   "192.168.1.x"
