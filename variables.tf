@@ -33,6 +33,12 @@ variable "pub_key" {
   type        = string
 }
 
+variable "storage_name_location" {
+  description = "Storage location in proxmox"
+  type        = string
+}
+
+
 variable "num_k8s_masters_name" {
   description = "name of the vm node to create the VMs on"
   type        = string
