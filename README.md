@@ -27,7 +27,7 @@ Sebelum memulai, pastikan Anda telah memenuhi syarat berikut:
 - membuat user api proxmox
 
 ## Instalasi
-1. git clone
+1. git clone https://github.com/ForensicID/terraform-kubernetes.git
 2. cd terraform-kubernetes
 3. "sesuaikan variables.tfvars, wordpress/mysql-deployment.yaml, wordpress/wordpress-deployment.yaml"
 4. cp -R variables.tfvars.sample variables.tfvars
