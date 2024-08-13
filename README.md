@@ -19,6 +19,13 @@ Proyek ini menggunakan Terraform untuk mengelola infrastruktur di platform Proxm
 - **Terraform**: Versi terbaru
 - **kubectl**: Versi terbaru (untuk mengelola kluster Kubernetes)
 
+## Prasyarat
+
+Sebelum memulai, pastikan Anda telah memenuhi syarat berikut:
+
+- sudah mempunyai template cloud init
+- membuat user api proxmox
+
 ## Instalasi
 1. git clone
 2. cd terraform-kubernetes
