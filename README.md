@@ -23,6 +23,7 @@ Proyek ini menggunakan Terraform untuk mengelola infrastruktur di platform Proxm
 
 Sebelum memulai, pastikan Anda telah memenuhi syarat berikut:
 
+- mempunyai username: user, dan akses root
 - sudah mempunyai template cloud init
 - membuat user api proxmox
 - mengganti hosts.ini dengan ip yang akan digunakan
