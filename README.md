@@ -37,3 +37,5 @@ Sebelum memulai, pastikan Anda telah memenuhi syarat berikut:
 4. terraform init
 5. terraform plan -var-file=variables.tfvars
 6. terraform apply -var-file=variables.tfvars
+
+### Jika ada pertanyaan silahkan
